@@ -1,12 +1,9 @@
-# ============================================================
-# MEMORA — AI Study Tool
-# ============================================================
+# MEMORA - AI Study Tool
 # To run:
 #   1. pip install -r requirements.txt
 #   2. Add GROQ_API_KEY="your-key-here" to .env
 #   3. python3 main.py
 #   4. Open http://localhost:5000 in your browser
-# ============================================================
 
 import json
 import os
@@ -24,14 +21,11 @@ app = Flask(__name__)
 # Change this to any random string for real use.
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "memora-dev-secret-123")
 
-# ── In-memory store ──────────────────────────────────────────
-# Flask's default session stores data in the browser cookie,
-# which has a ~4 KB size limit. We keep the big AI responses
-# here instead, and only store a short session_id in the cookie.
+# in-memory store - keeps AI responses server-side since cookies have a 4KB limit
 study_data: dict = {}
 
 
-# ── Groq helper ──────────────────────────────────────────────
+# ── Gemini helper ────────────────────────────────────────────
 
 def ask_ai(prompt: str) -> str:
     """Send a prompt to Groq and return the plain-text response."""
@@ -46,8 +40,8 @@ def ask_ai(prompt: str) -> str:
 
 def parse_json(response: str):
     """
-    Parse JSON out of Claude's response.
-    Claude sometimes wraps JSON in ```json ... ``` markdown — this strips that.
+    Parse JSON out of Groq's response.
+    The model sometimes wraps JSON in ```json ... ``` markdown — this strips that.
     """
     response = response.strip()
     if "```json" in response:
@@ -57,7 +51,7 @@ def parse_json(response: str):
     return json.loads(response.strip())
 
 
-# ── Content generators ───────────────────────────────────────
+# content generators - one for each study mode
 
 def generate_flashcards(topic: str) -> list:
     prompt = f"""Create exactly 10 flashcards for studying "{topic}".
@@ -82,7 +76,7 @@ Return ONLY a valid JSON array — no explanation, no markdown:
     return parse_json(ask_ai(prompt))
 
 
-# ── Session helpers ──────────────────────────────────────────
+# session helpers
 
 def get_session_id() -> str:
     """Get (or create) a unique ID for this browser session."""
@@ -99,7 +93,7 @@ def set_data(data: dict):
     study_data[get_session_id()] = data
 
 
-# ── Routes ───────────────────────────────────────────────────
+# routes
 
 @app.route("/")
 def index():
@@ -110,7 +104,7 @@ def index():
 def generate():
     """
     Called when the user submits the home form.
-    Generates content with Claude and stores it, then redirects to the right mode.
+    Generates content with Groq and stores it, then redirects to the right mode.
     """
     topic = request.form.get("topic", "").strip()
     mode = request.form.get("mode", "")
@@ -141,7 +135,7 @@ def generate():
         return redirect(url_for("brain_dump"))
 
 
-# ── Flashcards ───────────────────────────────────────────────
+# flashcards route
 
 @app.route("/flashcards")
 def flashcards():
@@ -151,7 +145,7 @@ def flashcards():
     return render_template("flashcards.html", topic=d["topic"], cards=d["cards"])
 
 
-# ── Study Guide ──────────────────────────────────────────────
+# study guide route
 
 @app.route("/study_guide", methods=["GET", "POST"])
 def study_guide():
@@ -197,7 +191,7 @@ def study_guide():
     )
 
 
-# ── Brain Dump ───────────────────────────────────────────────
+# brain dump route
 
 @app.route("/brain_dump", methods=["GET", "POST"])
 def brain_dump():
@@ -229,8 +223,5 @@ def brain_dump():
     )
 
 
-# ── Run ──────────────────────────────────────────────────────
-
 if __name__ == "__main__":
-    # debug=True auto-reloads when you save the file
     app.run(host="0.0.0.0", port=5000, debug=False)

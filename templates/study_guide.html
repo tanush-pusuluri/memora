@@ -10,9 +10,7 @@
   {% endif %}
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     STATE 3 — DONE: show all sections side by side
-═══════════════════════════════════════════════════════════ -->
+<!-- done - show all sections side by side -->
 {% if done %}
 
   <div class="results-header">
@@ -41,9 +39,7 @@
   </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     STATE 2 — COMPARE: user wrote their version, now show AI's
-═══════════════════════════════════════════════════════════ -->
+<!-- compare - user already wrote their version, now show AI's -->
 {% elif show_ai %}
 
   <div class="section-work">
@@ -73,9 +69,7 @@
   </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════
-     STATE 1 — WRITE: user writes their version first
-═══════════════════════════════════════════════════════════ -->
+<!-- write - user writes their version first -->
 {% else %}
 
   <div class="section-work">
