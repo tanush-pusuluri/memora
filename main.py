@@ -25,7 +25,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "memora-dev-secret-123")
 study_data: dict = {}
 
 
-# ── Gemini helper ────────────────────────────────────────────
+# Groq Helper
 
 def ask_ai(prompt: str) -> str:
     """Send a prompt to Groq and return the plain-text response."""
