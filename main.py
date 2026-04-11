@@ -2,8 +2,8 @@
 # MEMORA — AI Study Tool
 # ============================================================
 # To run:
-#   1. pip install flask google-generativeai
-#   2. export GEMINI_API_KEY="your-key-here"
+#   1. pip install -r requirements.txt
+#   2. Add GROQ_API_KEY="your-key-here" to .env
 #   3. python3 main.py
 #   4. Open http://localhost:5000 in your browser
 # ============================================================
@@ -31,7 +31,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "memora-dev-secret-123")
 study_data: dict = {}
 
 
-# ── Gemini helper ────────────────────────────────────────────
+# ── Groq helper ──────────────────────────────────────────────
 
 def ask_ai(prompt: str) -> str:
     """Send a prompt to Groq and return the plain-text response."""
