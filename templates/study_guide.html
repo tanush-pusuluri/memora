@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Study Guide{% endblock %}
+
+{% block content %}
+
+<div class="session-header">
+  <h2>Study Guide: <span class="topic-name">{{ topic }}</span></h2>
+  {% if not done %}
+  <span class="progress-badge">Section {{ idx + 1 }} of {{ sections | length }}</span>
+  {% endif %}
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATE 3 — DONE: show all sections side by side
+═══════════════════════════════════════════════════════════ -->
+{% if done %}
+
+  <div class="results-header">
+    <h3>Your Study Guide is Complete!</h3>
+    <p>Here's what you wrote compared to the AI-generated version. Your words are what matter most.</p>
+  </div>
+
+  {% for section in sections %}
+  <div class="comparison-block">
+    <h4 class="section-title">{{ section.title }}</h4>
+    <div class="two-col">
+      <div class="col-user">
+        <span class="label label-user">Your Words</span>
+        <p>{{ user_sections[loop.index0] if loop.index0 < user_sections | length else "(skipped)" }}</p>
+      </div>
+      <div class="col-ai">
+        <span class="label label-ai">AI Version</span>
+        <p>{{ section.content }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="done-actions">
+    <a href="/" class="btn-primary">Study Another Topic</a>
+  </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATE 2 — COMPARE: user wrote their version, now show AI's
+═══════════════════════════════════════════════════════════ -->
+{% elif show_ai %}
+
+  <div class="section-work">
+    <h3>{{ sections[idx].title }}</h3>
+
+    <div class="two-col">
+      <div class="col-user">
+        <span class="label label-user">Your Words</span>
+        <p>{{ user_sections[-1] if user_sections else "" }}</p>
+      </div>
+      <div class="col-ai">
+        <span class="label label-ai">AI Version</span>
+        <p>{{ sections[idx].content }}</p>
+      </div>
+    </div>
+
+    <form method="POST" style="margin-top: 1.5rem;">
+      <input type="hidden" name="action" value="next_section" />
+      <button type="submit" class="btn-primary">
+        {% if idx + 1 < sections | length %}
+          Next Section →
+        {% else %}
+          See Full Study Guide →
+        {% endif %}
+      </button>
+    </form>
+  </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATE 1 — WRITE: user writes their version first
+═══════════════════════════════════════════════════════════ -->
+{% else %}
+
+  <div class="section-work">
+    <h3>{{ sections[idx].title }}</h3>
+    <p class="instruction">
+      Write what you know about this section in your own words.
+      You won't see the AI version until you submit — that's the point!
+    </p>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="submit_section" />
+      <textarea
+        name="user_text"
+        placeholder="Write your explanation of '{{ sections[idx].title }}' here..."
+        rows="8"
+      ></textarea>
+      <button type="submit" class="btn-primary">Submit &amp; See AI Version</button>
+    </form>
+  </div>
+
+  <!-- Show previous sections as a mini-progress list -->
+  {% if user_sections %}
+  <div class="section-progress">
+    <p class="label">Sections completed:</p>
+    <ul>
+      {% for s in sections[:idx] %}
+      <li>✓ {{ s.title }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}

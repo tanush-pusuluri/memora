@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <h1>What do you want to study today?</h1>
+  <p>Memora doesn't just give you information — it makes you <em>write</em> it.</p>
+</div>
+
+<!-- The form posts to /generate, which calls Claude and redirects to the right page -->
+<form id="topic-form" action="/generate" method="POST" class="topic-form">
+
+  <input
+    type="text"
+    name="topic"
+    placeholder="e.g. Photosynthesis, World War II, Newton's Laws..."
+    required
+    autocomplete="off"
+  />
+
+  <!-- Pick a study mode -->
+  <div class="modes">
+
+    <label class="mode-card">
+      <input type="radio" name="mode" value="flashcards" required />
+      <div class="mode-content">
+        <div class="mode-icon">🃏</div>
+        <h3>Flashcards</h3>
+        <p>Test yourself on key Q&amp;A pairs. Think first, then reveal the answer.</p>
+      </div>
+    </label>
+
+    <label class="mode-card">
+      <input type="radio" name="mode" value="study_guide" />
+      <div class="mode-content">
+        <div class="mode-icon">✍️</div>
+        <h3>Study Guide</h3>
+        <p>Write each section <em>in your own words</em> before seeing the AI version.</p>
+      </div>
+    </label>
+
+    <label class="mode-card">
+      <input type="radio" name="mode" value="brain_dump" />
+      <div class="mode-content">
+        <div class="mode-icon">🧠</div>
+        <h3>Brain Dump</h3>
+        <p>Write everything you already know about each key concept, then compare.</p>
+      </div>
+    </label>
+
+  </div>
+
+  <button type="submit" class="btn-primary" id="submit-btn">
+    Start Studying
+  </button>
+
+  <!-- Shows while waiting for Claude to respond (~5-10 seconds) -->
+  <p class="loading-msg hidden" id="loading-msg">
+    Generating your study session... this takes a few seconds ⏳
+  </p>
+
+</form>
+
+<script>
+  // When the form is submitted, disable the button and show a loading message
+  document.getElementById("topic-form").addEventListener("submit", function () {
+    var btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Generating...";
+    document.getElementById("loading-msg").classList.remove("hidden");
+  });
+
+  // Clicking a mode card selects its radio button (makes the whole card clickable)
+  document.querySelectorAll(".mode-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      document.querySelectorAll(".mode-content").forEach(function (c) {
+        c.classList.remove("selected");
+      });
+      card.querySelector(".mode-content").classList.add("selected");
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Flashcards{% endblock %}
+
+{% block content %}
+
+<div class="session-header">
+  <h2>Flashcards: <span class="topic-name">{{ topic }}</span></h2>
+  <a href="/" class="btn-secondary">New Topic</a>
+</div>
+
+<!-- Progress counter — updated by JS -->
+<div class="card-counter">
+  Card <span id="current-num">1</span> of {{ cards | length }}
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar-track">
+  <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+</div>
+
+<div class="flashcard-container">
+
+  <!-- One div per flashcard; all but the first are hidden -->
+  {% for card in cards %}
+  <div class="flashcard {% if not loop.first %}hidden{% endif %}" id="card-{{ loop.index0 }}">
+
+    <div class="card-question">
+      <span class="label">Question {{ loop.index }} / {{ cards | length }}</span>
+      <p>{{ card.question }}</p>
+    </div>
+
+    <!-- Answer is hidden until the button is clicked -->
+    <div class="card-answer hidden" id="answer-{{ loop.index0 }}">
+      <span class="label">Answer</span>
+      <p>{{ card.answer }}</p>
+    </div>
+
+    <div class="card-actions">
+      <!-- Reveal button — hidden after clicking -->
+      <button
+        class="btn-reveal"
+        id="reveal-btn-{{ loop.index0 }}"
+        onclick="showAnswer({{ loop.index0 }})"
+      >
+        Reveal Answer
+      </button>
+
+      <!-- Got it / Still learning — shown after revealing -->
+      <div class="result-buttons hidden" id="result-{{ loop.index0 }}">
+        <button class="btn-got-it" onclick="nextCard({{ loop.index0 }}, true)">
+          ✓ Got it
+        </button>
+        <button class="btn-learning" onclick="nextCard({{ loop.index0 }}, false)">
+          ↩ Still learning
+        </button>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <!-- Final screen shown after the last card -->
+  <div class="flashcard hidden" id="card-{{ cards | length }}">
+    <div class="done-screen">
+      <div class="done-icon">🎉</div>
+      <h3>All done!</h3>
+      <p id="score-text"></p>
+      <a href="/" class="btn-primary">Study Another Topic</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var gotIt = 0;
+  var total = {{ cards | length }};
+
+  function showAnswer(idx) {
+    document.getElementById("answer-" + idx).classList.remove("hidden");
+    document.getElementById("reveal-btn-" + idx).classList.add("hidden");
+    document.getElementById("result-" + idx).classList.remove("hidden");
+  }
+
+  function nextCard(idx, correct) {
+    if (correct) gotIt++;
+
+    // Hide current card
+    document.getElementById("card-" + idx).classList.add("hidden");
+
+    var next = idx + 1;
+
+    // Update counter and progress bar
+    document.getElementById("current-num").textContent = Math.min(next + 1, total);
+    var pct = Math.round((next / total) * 100);
+    document.getElementById("progress-bar").style.width = pct + "%";
+
+    // Show next card (or the done screen)
+    document.getElementById("card-" + next).classList.remove("hidden");
+
+    if (next === total) {
+      // Show final score
+      document.getElementById("score-text").textContent =
+        "You got " + gotIt + " out of " + total + " correct!";
+    }
+  }
+</script>
+
+{% endblock %}

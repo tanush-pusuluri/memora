@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Brain Dump{% endblock %}
+
+{% block content %}
+
+<div class="session-header">
+  <h2>Brain Dump: <span class="topic-name">{{ topic }}</span></h2>
+  <a href="/" class="btn-secondary">New Topic</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RESULTS VIEW — after the user submits their responses
+═══════════════════════════════════════════════════════════ -->
+{% if show_results %}
+
+  <div class="results-header">
+    <h3>Here's how you did!</h3>
+    <p>Your brain dump is on the left. The full explanation is on the right. Compare and see what you remembered.</p>
+  </div>
+
+  {% for concept in concepts %}
+  <div class="comparison-block">
+    <h4 class="section-title">{{ concept.term }}</h4>
+    <div class="two-col">
+      <div class="col-user">
+        <span class="label label-user">What You Wrote</span>
+        <p>{{ user_responses[loop.index0] if loop.index0 in user_responses else "(nothing written)" }}</p>
+      </div>
+      <div class="col-ai">
+        <span class="label label-ai">Full Explanation</span>
+        <p>{{ concept.explanation }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="done-actions">
+    <a href="/" class="btn-primary">Study Another Topic</a>
+  </div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     WRITE VIEW — user fills in what they know
+═══════════════════════════════════════════════════════════ -->
+{% else %}
+
+  <p class="instruction">
+    For each concept below, write <strong>everything you already know</strong> about it —
+    from memory, no looking things up. Even a few words is fine.
+    You'll see the full explanation after you submit.
+  </p>
+
+  <form method="POST">
+    {% for concept in concepts %}
+    <div class="brain-dump-card">
+      <label for="response_{{ loop.index0 }}">
+        <h4>{{ concept.term }}</h4>
+      </label>
+      <textarea
+        id="response_{{ loop.index0 }}"
+        name="response_{{ loop.index0 }}"
+        placeholder="Write what you know about '{{ concept.term }}'..."
+        rows="4"
+      ></textarea>
+    </div>
+    {% endfor %}
+
+    <div class="submit-area">
+      <button type="submit" class="btn-primary">Submit &amp; See Explanations</button>
+    </div>
+  </form>
+
+{% endif %}
+
+{% endblock %}

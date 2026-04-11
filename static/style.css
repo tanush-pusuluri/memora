@@ -1,0 +1,559 @@
+/* ============================================================
+   MEMORA — Styles
+   ============================================================ */
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #1a1a2e;
+  line-height: 1.65;
+}
+
+a { color: inherit; }
+
+/* ── Nav ─────────────────────────────────────────────────── */
+nav {
+  background: #fff;
+  border-bottom: 1px solid #e8e8ef;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #5b4fcf;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+
+.tagline {
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* ── Main layout ─────────────────────────────────────────── */
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+  color: #0f0f1a;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  color: #666;
+}
+
+/* ── Topic Form ──────────────────────────────────────────── */
+.topic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.topic-form input[type="text"] {
+  padding: 0.9rem 1.2rem;
+  font-size: 1.05rem;
+  border: 2px solid #e0e0ea;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+
+.topic-form input[type="text"]:focus {
+  border-color: #5b4fcf;
+}
+
+/* ── Mode Cards ──────────────────────────────────────────── */
+.modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.mode-card {
+  cursor: pointer;
+}
+
+.mode-card input[type="radio"] {
+  display: none;   /* hide the actual radio button; the card IS the button */
+}
+
+.mode-content {
+  padding: 1.4rem 1rem;
+  border: 2px solid #e0e0ea;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.mode-content:hover {
+  border-color: #5b4fcf;
+  transform: translateY(-2px);
+}
+
+/* When the radio inside is checked, highlight the card */
+.mode-card input:checked + .mode-content,
+.mode-content.selected {
+  border-color: #5b4fcf;
+  background: #f0edff;
+}
+
+.mode-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.mode-content h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.mode-content p {
+  font-size: 0.82rem;
+  color: #666;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-block;
+  background: #5b4fcf;
+  color: #fff;
+  border: none;
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+  background: #4a3fbe;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-block;
+  background: #fff;
+  color: #5b4fcf;
+  border: 2px solid #5b4fcf;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f0edff;
+}
+
+/* ── Loading message ─────────────────────────────────────── */
+.loading-msg {
+  color: #888;
+  font-size: 0.95rem;
+  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Session Header ──────────────────────────────────────── */
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.session-header h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.topic-name {
+  color: #5b4fcf;
+}
+
+.progress-badge {
+  background: #f0edff;
+  color: #5b4fcf;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+
+/* ── Progress Bar ────────────────────────────────────────── */
+.card-counter {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 0.6rem;
+}
+
+.progress-bar-track {
+  background: #e0e0ea;
+  border-radius: 99px;
+  height: 6px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  background: #5b4fcf;
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Flashcards ──────────────────────────────────────────── */
+.flashcard-container {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.flashcard {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border: 1px solid #e8e8ef;
+}
+
+.card-question p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f0f1a;
+  margin-top: 0.5rem;
+}
+
+.card-answer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed #e0e0ea;
+}
+
+.card-answer p {
+  color: #333;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.card-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-reveal {
+  background: #5b4fcf;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-reveal:hover { background: #4a3fbe; }
+
+.btn-got-it {
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-got-it:hover { background: #16a34a; }
+
+.btn-learning {
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-learning:hover { background: #d97706; }
+
+.result-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Done screen inside the card */
+.done-screen {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.done-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.done-screen h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.done-screen p {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Labels ──────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #888;
+  margin-bottom: 0.4rem;
+}
+
+.label-user { color: #2563eb; }
+.label-ai   { color: #16a34a; }
+
+/* ── Two-column comparison ───────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.col-user {
+  background: #dbeafe;
+  padding: 1.1rem;
+  border-radius: 10px;
+}
+
+.col-user p { color: #1e3a5f; }
+
+.col-ai {
+  background: #dcfce7;
+  padding: 1.1rem;
+  border-radius: 10px;
+}
+
+.col-ai p { color: #14532d; }
+
+/* ── Section Work (Study Guide write & compare views) ─────── */
+.section-work {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  border: 1px solid #e8e8ef;
+}
+
+.section-work h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* ── Instruction text ────────────────────────────────────── */
+.instruction {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+/* ── Textarea ────────────────────────────────────────────── */
+textarea {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.6;
+  border: 2px solid #e0e0ea;
+  border-radius: 10px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s;
+  background: #fafafa;
+  margin-bottom: 1rem;
+}
+
+textarea:focus {
+  border-color: #5b4fcf;
+  background: #fff;
+}
+
+/* ── Section progress list ───────────────────────────────── */
+.section-progress {
+  margin-top: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e8e8ef;
+}
+
+.section-progress ul {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.section-progress li {
+  color: #22c55e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.2rem 0;
+}
+
+/* ── Comparison Block (used in done + brain dump results) ─── */
+.comparison-block {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  border: 1px solid #e8e8ef;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #0f0f1a;
+}
+
+/* ── Results Header ──────────────────────────────────────── */
+.results-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.results-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.results-header p {
+  color: #666;
+}
+
+/* ── Done Actions ────────────────────────────────────────── */
+.done-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* ── Brain Dump Cards ────────────────────────────────────── */
+.brain-dump-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.4rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e8e8ef;
+}
+
+.brain-dump-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #0f0f1a;
+}
+
+.brain-dump-card label {
+  display: block;
+  cursor: default;
+}
+
+.submit-area {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+/* ── Utility ─────────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .modes {
+    grid-template-columns: 1fr;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .session-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
