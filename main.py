@@ -43,12 +43,19 @@ def parse_json(response: str):
 # content moderation
 
 def is_appropriate_topic(topic: str) -> bool:
-    prompt = f"""Is the following study topic appropriate for middle school students (ages 11-14)?
+    prompt = f"""Is the following study topic appropriate for middle school students (ages 11-14) to study academically?
 
 Topic: "{topic}"
 
-Answer YES for ALL legitimate academic topics including history of wars/atrocities, social issues, LGBTQ history and rights, health, biology, religion, politics, or anything taught in schools.
-Answer NO only if the topic contains explicit profanity or slurs as the subject itself, step-by-step instructions for illegal activities, explicit sexual content (not health/biology), or has zero educational value.
+Answer YES for legitimate academic topics: history, science, math, literature, social issues, LGBTQ history, health, biology, religion, politics, classic novels, etc.
+Also answer YES if a word that could be an expletive appears as part of a well-known academic work or proper noun (e.g. "Moby Dick", "The Catcher in the Rye", "Dick Cheney").
+
+Answer NO if:
+- The topic is just an expletive or slur by itself with no academic context
+- The topic is clearly sexual, pornographic, or grossly offensive with no educational value
+- The topic asks for instructions for illegal or dangerous activities
+
+When in doubt about a borderline word, consider whether a middle school English or history teacher would assign it. If yes, answer YES.
 
 Reply with only YES or NO."""
     try:
