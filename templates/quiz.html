@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Practice Quiz{% endblock %}
+
+{% block content %}
+
+<div class="session-header">
+  <h2>Quiz: <span class="topic-name">{{ topic }}</span></h2>
+  <a href="/" class="btn-secondary">New Topic</a>
+</div>
+
+<!-- results view -->
+{% if show_results %}
+
+  <div class="results-header">
+    <h3>You got {{ score }} / {{ questions | length }} correct!</h3>
+    <p>
+      {% if score == questions | length %}
+        Perfect score!
+      {% elif score >= (questions | length * 0.7) | int %}
+        Nice work — review the ones you missed.
+      {% else %}
+        Keep studying — you'll get there!
+      {% endif %}
+    </p>
+  </div>
+
+  {% for q in questions %}
+  {% set user_ans = user_answers[loop.index0] %}
+  {% set correct = user_ans == q.answer %}
+  <div class="comparison-block">
+    <p class="section-title">{{ loop.index }}. {{ q.question }}</p>
+    <div class="quiz-result {{ 'quiz-correct' if correct else 'quiz-wrong' }}">
+      <p><strong>Your answer:</strong> {{ user_ans if user_ans else "(no answer)" }}</p>
+      {% if not correct %}
+      <p><strong>Correct answer:</strong> {{ q.answer }}</p>
+      {% endif %}
+      <p class="quiz-explanation">{{ q.explanation }}</p>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="done-actions">
+    <a href="/" class="btn-primary">Study Another Topic</a>
+  </div>
+
+<!-- quiz view -->
+{% else %}
+
+  <p class="instruction">Answer all {{ questions | length }} questions, then submit to see your score.</p>
+
+  <form method="POST">
+    {% for q in questions %}
+    {% set q_idx = loop.index0 %}
+    <div class="quiz-card">
+      <p class="quiz-question">{{ loop.index }}. {{ q.question }}</p>
+      <div class="quiz-options">
+        {% for option in q.options %}
+        <label class="quiz-option">
+          <input type="radio" name="answer_{{ q_idx }}" value="{{ option }}" required />
+          <span>{{ option }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="submit-area">
+      <button type="submit" class="btn-primary">Submit Quiz</button>
+    </div>
+  </form>
+
+{% endif %}
+
+{% endblock %}

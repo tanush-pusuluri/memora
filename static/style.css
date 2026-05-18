@@ -533,6 +533,186 @@ textarea:focus {
   text-align: center;
 }
 
+/* ── Mode options (count slider, difficulty) ─────────────── */
+.mode-options {
+  background: #f8f7ff;
+  border: 2px solid #e0e0ea;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+}
+
+.options-row {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.option-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.option-group input[type="range"] {
+  accent-color: #5b4fcf;
+  width: 100%;
+}
+
+.option-group select {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e0e0ea;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+.option-group select:focus {
+  border-color: #5b4fcf;
+}
+
+/* ── Quiz ────────────────────────────────────────────────── */
+.quiz-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.4rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e8e8ef;
+}
+
+.quiz-question {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f0f1a;
+  margin-bottom: 1rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid #e0e0ea;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 0.95rem;
+}
+
+.quiz-option:hover {
+  border-color: #5b4fcf;
+  background: #f8f7ff;
+}
+
+.quiz-option input[type="radio"] {
+  accent-color: #5b4fcf;
+}
+
+.quiz-result {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.quiz-correct {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.quiz-wrong {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.quiz-explanation {
+  margin-top: 0.5rem;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* ── Brain Dump Assessment ───────────────────────────────── */
+.assessment-block {
+  background: #fff;
+  border: 2px solid #f59e0b;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.assessment-block h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.4rem;
+}
+
+.assessment-block h4 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #78350f;
+  margin: 1rem 0 0.5rem;
+}
+
+.assessment-block > p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.assessment-tips {
+  padding-left: 1.2rem;
+}
+
+.assessment-tips li {
+  color: #333;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.assessment-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.resource-card {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.resource-card strong {
+  color: #92400e;
+  font-size: 0.95rem;
+}
+
+.resource-card p {
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
 /* ── Utility ─────────────────────────────────────────────── */
 .hidden {
   display: none !important;
