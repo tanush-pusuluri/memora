@@ -13,7 +13,6 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from groq import Groq
 
 app = Flask(__name__)
-
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "memora-dev-secret-123")
 
 # in-memory store - keeps AI responses server-side since cookies have a 4KB limit
@@ -22,11 +21,11 @@ study_data: dict = {}
 
 # Groq API helper
 
-def ask_ai(prompt: str) -> str:
+def ask_ai(prompt: str, max_tokens: int = 2048) -> str:
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     message = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        max_tokens=2048,
+        max_tokens=max_tokens,
         messages=[{"role": "user", "content": prompt}],
     )
     return message.choices[0].message.content
@@ -39,6 +38,24 @@ def parse_json(response: str):
     elif "```" in response:
         response = response.split("```")[1].split("```")[0]
     return json.loads(response.strip())
+
+
+# content moderation
+
+def is_appropriate_topic(topic: str) -> bool:
+    prompt = f"""Is the following study topic appropriate for middle school students (ages 11-14)?
+
+Topic: "{topic}"
+
+Answer YES for ALL legitimate academic topics including history of wars/atrocities, social issues, LGBTQ history and rights, health, biology, religion, politics, or anything taught in schools.
+Answer NO only if the topic contains explicit profanity or slurs as the subject itself, step-by-step instructions for illegal activities, explicit sexual content (not health/biology), or has zero educational value.
+
+Reply with only YES or NO."""
+    try:
+        result = ask_ai(prompt, max_tokens=10)
+        return "NO" not in result.strip().upper()[:5]
+    except Exception:
+        return True  # fail open so errors don't block students
 
 
 # content generators - one for each study mode
@@ -56,13 +73,30 @@ Keep each answer to 1-3 sentences."""
     return parse_json(ask_ai(prompt))
 
 
-def generate_quiz(topic: str, difficulty: str = "medium") -> list:
+def generate_quiz(topic: str, count: int = 8, difficulty: str = "medium") -> list:
     level = {
         "easy": "basic recall",
         "medium": "understanding and application",
         "hard": "analysis and synthesis",
     }.get(difficulty, "understanding and application")
-    prompt = f"""Create exactly 8 multiple choice questions about "{topic}" at {level} level.
+    prompt = f"""Create exactly {count} multiple choice questions about "{topic}" at {level} level.
+Return ONLY a valid JSON array — no explanation, no markdown:
+[{{"question": "Question?", "options": ["Option A", "Option B", "Option C", "Option D"], "answer": "Option A", "explanation": "Why this is correct."}}]
+The answer field must be the exact text of the correct option."""
+    return parse_json(ask_ai(prompt))
+
+
+def generate_quiz_more(topic: str, difficulty: str, previous_questions: list) -> list:
+    level = {
+        "easy": "basic recall",
+        "medium": "understanding and application",
+        "hard": "analysis and synthesis",
+    }.get(difficulty, "understanding and application")
+    prev_str = "\n".join(f"- {q['question']}" for q in previous_questions)
+    prompt = f"""Create exactly 10 NEW multiple choice questions about "{topic}" at {level} level.
+Do NOT repeat or rephrase any of these already-asked questions:
+{prev_str}
+
 Return ONLY a valid JSON array — no explanation, no markdown:
 [{{"question": "Question?", "options": ["Option A", "Option B", "Option C", "Option D"], "answer": "Option A", "explanation": "Why this is correct."}}]
 The answer field must be the exact text of the correct option."""
@@ -77,9 +111,9 @@ Return ONLY a valid JSON array — no explanation, no markdown:
 
 
 def generate_assessment(topic: str, weak_areas: list) -> dict:
-    prompt = f"""A student studying "{topic}" left these concepts completely blank: {', '.join(weak_areas)}.
+    prompt = f"""A student studying "{topic}" is struggling with: {', '.join(weak_areas)}.
 Return ONLY valid JSON — no explanation, no markdown:
-{{"summary": "One sentence about what they need to focus on.", "tips": ["specific study tip 1", "specific study tip 2", "specific study tip 3"], "resources": [{{"name": "Resource name", "description": "What to search for or how to use this resource to learn the topic"}}]}}
+{{"summary": "One sentence about what they need to focus on.", "tips": ["specific study tip 1", "specific study tip 2", "specific study tip 3"], "resources": [{{"name": "Resource name", "description": "What to search for or how to use this resource"}}]}}
 For resources, only suggest well-known free platforms like Khan Academy, Crash Course on YouTube, or similar. Include exactly 3 resources."""
     return parse_json(ask_ai(prompt))
 
@@ -104,7 +138,8 @@ def set_data(data: dict):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    error = request.args.get("error", "")
+    return render_template("index.html", error=error)
 
 
 @app.route("/generate", methods=["POST"])
@@ -114,6 +149,9 @@ def generate():
 
     if not topic or mode not in ("flashcards", "quiz", "brain_dump"):
         return redirect(url_for("index"))
+
+    if not is_appropriate_topic(topic):
+        return redirect(url_for("index", error="inappropriate"))
 
     if mode == "flashcards":
         try:
@@ -126,9 +164,13 @@ def generate():
         return redirect(url_for("flashcards"))
 
     elif mode == "quiz":
+        try:
+            count = min(20, max(5, int(request.form.get("quiz_count", 8))))
+        except (ValueError, TypeError):
+            count = 8
         difficulty = request.form.get("difficulty", "medium")
-        questions = generate_quiz(topic, difficulty)
-        set_data({"topic": topic, "mode": mode, "questions": questions})
+        questions = generate_quiz(topic, count, difficulty)
+        set_data({"topic": topic, "mode": mode, "questions": questions, "difficulty": difficulty})
         return redirect(url_for("quiz"))
 
     elif mode == "brain_dump":
@@ -137,7 +179,7 @@ def generate():
         return redirect(url_for("brain_dump"))
 
 
-# flashcards route
+# flashcards routes
 
 @app.route("/flashcards")
 def flashcards():
@@ -147,7 +189,27 @@ def flashcards():
     return render_template("flashcards.html", topic=d["topic"], cards=d["cards"])
 
 
-# quiz route
+@app.route("/flashcards_review", methods=["POST"])
+def flashcards_review():
+    d = get_data()
+    if not d or d.get("mode") != "flashcards":
+        return redirect(url_for("index"))
+
+    cards = d["cards"]
+    indices = request.form.getlist("still_learning")
+    weak_cards = [cards[int(i)] for i in indices if i.isdigit() and int(i) < len(cards)]
+    weak_areas = [c["question"] for c in weak_cards]
+    assessment = generate_assessment(d["topic"], weak_areas) if weak_areas else None
+
+    return render_template(
+        "flashcards_review.html",
+        topic=d["topic"],
+        weak_cards=weak_cards,
+        assessment=assessment,
+    )
+
+
+# quiz routes
 
 @app.route("/quiz", methods=["GET", "POST"])
 def quiz():
@@ -162,6 +224,10 @@ def quiz():
         for i in range(len(questions)):
             user_answers[i] = request.form.get(f"answer_{i}", "")
         score = sum(1 for i, q in enumerate(questions) if user_answers.get(i) == q["answer"])
+
+        wrong = [q for i, q in enumerate(questions) if user_answers.get(i) != q["answer"]]
+        assessment = generate_assessment(d["topic"], [q["question"] for q in wrong]) if wrong else None
+
         return render_template(
             "quiz.html",
             topic=d["topic"],
@@ -169,9 +235,22 @@ def quiz():
             user_answers=user_answers,
             score=score,
             show_results=True,
+            assessment=assessment,
         )
 
     return render_template("quiz.html", topic=d["topic"], questions=questions, show_results=False)
+
+
+@app.route("/quiz_more", methods=["POST"])
+def quiz_more():
+    d = get_data()
+    if not d or d.get("mode") != "quiz":
+        return redirect(url_for("index"))
+
+    new_questions = generate_quiz_more(d["topic"], d.get("difficulty", "medium"), d["questions"])
+    d["questions"] = new_questions
+    set_data(d)
+    return redirect(url_for("quiz"))
 
 
 # brain dump route

@@ -65,7 +65,14 @@
       <div class="done-icon">🎉</div>
       <h3>All done!</h3>
       <p id="score-text"></p>
-      <a href="/" class="btn-primary">Study Another Topic</a>
+      <div class="card-actions" style="margin-top: 1.25rem;">
+        <a href="/" class="btn-primary">Study Another Topic</a>
+        <form id="review-form" method="POST" action="/flashcards_review" style="display: inline;">
+          <button type="submit" class="btn-secondary" id="review-btn" style="display: none;">
+            Get Study Tips
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -74,6 +81,7 @@
 <script>
   var gotIt = 0;
   var total = {{ cards | length }};
+  var stillLearning = [];
 
   function showAnswer(idx) {
     document.getElementById("answer-" + idx).classList.remove("hidden");
@@ -82,25 +90,37 @@
   }
 
   function nextCard(idx, correct) {
-    if (correct) gotIt++;
+    if (correct) {
+      gotIt++;
+    } else {
+      stillLearning.push(idx);
+    }
 
-    // Hide current card
     document.getElementById("card-" + idx).classList.add("hidden");
 
     var next = idx + 1;
 
-    // Update counter and progress bar
     document.getElementById("current-num").textContent = Math.min(next + 1, total);
     var pct = Math.round((next / total) * 100);
     document.getElementById("progress-bar").style.width = pct + "%";
 
-    // Show next card (or the done screen)
     document.getElementById("card-" + next).classList.remove("hidden");
 
     if (next === total) {
-      // Show final score
       document.getElementById("score-text").textContent =
         "You got " + gotIt + " out of " + total + " correct!";
+
+      if (stillLearning.length > 0) {
+        var form = document.getElementById("review-form");
+        stillLearning.forEach(function (i) {
+          var input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "still_learning";
+          input.value = i;
+          form.appendChild(input);
+        });
+        document.getElementById("review-btn").style.display = "inline-block";
+      }
     }
   }
 </script>

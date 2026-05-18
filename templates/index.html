@@ -7,6 +7,12 @@
   <h1>What do you want to study today?</h1>
 </div>
 
+{% if error == "inappropriate" %}
+<div class="error-msg">
+  That topic isn't appropriate for a school setting. Please enter something you'd actually study in class.
+</div>
+{% endif %}
+
 <form id="topic-form" action="/generate" method="POST" class="topic-form">
 
   <input
@@ -51,10 +57,15 @@
   <!-- options shown for flashcards and quiz -->
   <div id="study-options" class="mode-options hidden">
     <div class="options-row">
-      <div id="count-option" class="option-group hidden">
+      <div id="card-count-option" class="option-group hidden">
         <label for="card-count">Number of cards: <strong id="card-count-display">10</strong></label>
         <input type="range" id="card-count" name="card_count" min="5" max="25" value="10"
           oninput="document.getElementById('card-count-display').textContent = this.value" />
+      </div>
+      <div id="quiz-count-option" class="option-group hidden">
+        <label for="quiz-count">Number of questions: <strong id="quiz-count-display">8</strong></label>
+        <input type="range" id="quiz-count" name="quiz_count" min="5" max="20" value="8"
+          oninput="document.getElementById('quiz-count-display').textContent = this.value" />
       </div>
       <div class="option-group">
         <label for="difficulty">Difficulty</label>
@@ -94,14 +105,17 @@
 
       var mode = card.querySelector("input").value;
       var optionsDiv = document.getElementById("study-options");
-      var countDiv = document.getElementById("count-option");
+      var cardCountDiv = document.getElementById("card-count-option");
+      var quizCountDiv = document.getElementById("quiz-count-option");
 
       if (mode === "flashcards") {
         optionsDiv.classList.remove("hidden");
-        countDiv.classList.remove("hidden");
+        cardCountDiv.classList.remove("hidden");
+        quizCountDiv.classList.add("hidden");
       } else if (mode === "quiz") {
         optionsDiv.classList.remove("hidden");
-        countDiv.classList.add("hidden");
+        cardCountDiv.classList.add("hidden");
+        quizCountDiv.classList.remove("hidden");
       } else {
         optionsDiv.classList.add("hidden");
       }
