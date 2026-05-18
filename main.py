@@ -111,10 +111,18 @@ Return ONLY a valid JSON array — no explanation, no markdown:
 
 
 def generate_assessment(topic: str, weak_areas: list) -> dict:
-    prompt = f"""A student studying "{topic}" is struggling with: {', '.join(weak_areas)}.
+    prompt = f"""A student studying "{topic}" is struggling with these specific concepts: {', '.join(weak_areas)}.
+
 Return ONLY valid JSON — no explanation, no markdown:
 {{"summary": "One sentence about what they need to focus on.", "tips": ["specific study tip 1", "specific study tip 2", "specific study tip 3"], "resources": [{{"name": "Resource name", "description": "What to search for or how to use this resource"}}]}}
-For resources, only suggest well-known free platforms like Khan Academy, Crash Course on YouTube, or similar. Include exactly 3 resources."""
+
+For the 3 resources, pick ones that actually fit the subject matter — for example:
+- Science/math topics: Khan Academy, PhET simulations, National Geographic
+- History/social studies: HISTORY.com, Smithsonian Magazine, TED-Ed on YouTube
+- English/literature: SparkNotes, NoSweatShakespeare, TED-Ed on YouTube
+- General: Wikipedia is fine for overview, use YouTube channels specific to the subject
+
+Do NOT default to the same resources every time. Choose based on what would genuinely help someone learn these specific weak areas."""
     return parse_json(ask_ai(prompt))
 
 
