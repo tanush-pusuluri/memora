@@ -123,13 +123,13 @@ def generate_assessment(topic: str, weak_areas: list) -> dict:
 Return ONLY valid JSON — no explanation, no markdown:
 {{"summary": "One sentence about what they need to focus on.", "tips": ["specific study tip 1", "specific study tip 2", "specific study tip 3"], "resources": [{{"name": "Resource name", "description": "What to search for or how to use this resource"}}]}}
 
-For the 3 resources, pick ones that actually fit the subject matter — for example:
-- Science/math topics: Khan Academy, PhET simulations, National Geographic
-- History/social studies: HISTORY.com, Smithsonian Magazine, TED-Ed on YouTube
-- English/literature: SparkNotes, NoSweatShakespeare, TED-Ed on YouTube
-- General: Wikipedia is fine for overview, use YouTube channels specific to the subject
+Pick 3 resources that genuinely fit the subject. Vary them — do not always pick the same ones. Choose from this pool based on what fits best:
 
-Do NOT default to the same resources every time. Choose based on what would genuinely help someone learn these specific weak areas."""
+YouTube: Khan Academy, TED-Ed, Kurzgesagt, Veritasium, CGP Grey, SciShow, Extra History, Tom Scott, 3Blue1Brown, PBS Space Time, Numberphile, Vsauce, AsapSCIENCE, Crash Course (use sparingly)
+
+Websites: Khan Academy, Britannica, Wikipedia, National Geographic, Smithsonian Magazine, NASA, HISTORY.com, SparkNotes, MIT OpenCourseWare, Scientific American, Stanford Encyclopedia of Philosophy, National Geographic, BBC (use sparingly), The New York Times Learning Network, Newsela
+
+Match the resources to the subject — science topics get science channels, history topics get history sites, math gets math channels. Do not pick the same 3 every time."""
     return parse_json(ask_ai(prompt))
 
 

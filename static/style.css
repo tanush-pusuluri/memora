@@ -541,6 +541,28 @@ textarea:focus {
   cursor: default;
 }
 
+/* side-by-side layout for brain dump write view */
+.brain-dump-row {
+  align-items: stretch;
+}
+
+.brain-dump-row .col-ai,
+.brain-dump-row .col-write {
+  display: flex;
+  flex-direction: column;
+}
+
+.brain-dump-row .col-ai p {
+  flex: 1;
+}
+
+.brain-dump-row textarea {
+  flex: 1;
+  min-height: 120px;
+  margin-bottom: 0;
+  resize: none;
+}
+
 .submit-area {
   margin-top: 1.5rem;
   text-align: center;
