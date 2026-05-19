@@ -277,26 +277,34 @@ def brain_dump():
         return redirect(url_for("index"))
 
     concepts = d["concepts"]
-    user_responses = {}
 
     if request.method == "POST":
-        for i in range(len(concepts)):
-            text = request.form.get(f"response_{i}", "").strip()
-            user_responses[i] = text or "(left blank)"
+        action = request.form.get("action", "step2")
 
-        weak_areas = [concepts[i]["term"] for i in range(len(concepts)) if user_responses[i] == "(left blank)"]
-        assessment = generate_assessment(d["topic"], weak_areas) if weak_areas else None
+        if action == "step1":
+            step1 = {}
+            for i in range(len(concepts)):
+                text = request.form.get(f"response_{i}", "").strip()
+                step1[i] = text or "(left blank)"
+            d["step1_responses"] = step1
+            set_data(d)
+            return render_template("brain_dump.html",
+                topic=d["topic"], concepts=concepts, step=2, show_results=False)
 
-        return render_template(
-            "brain_dump.html",
-            topic=d["topic"],
-            concepts=concepts,
-            user_responses=user_responses,
-            show_results=True,
-            assessment=assessment,
-        )
+        else:
+            user_responses = {}
+            for i in range(len(concepts)):
+                text = request.form.get(f"response_{i}", "").strip()
+                user_responses[i] = text or "(left blank)"
 
-    return render_template("brain_dump.html", topic=d["topic"], concepts=concepts, show_results=False)
+            weak_areas = [concepts[i]["term"] for i in range(len(concepts)) if user_responses[i] == "(left blank)"]
+            assessment = generate_assessment(d["topic"], weak_areas) if weak_areas else None
+
+            return render_template("brain_dump.html",
+                topic=d["topic"], concepts=concepts,
+                user_responses=user_responses, show_results=True, assessment=assessment)
+
+    return render_template("brain_dump.html", topic=d["topic"], concepts=concepts, step=1, show_results=False)
 
 
 if __name__ == "__main__":

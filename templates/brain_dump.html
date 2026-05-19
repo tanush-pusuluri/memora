@@ -8,25 +8,25 @@
   <a href="/" class="btn-secondary">New Topic</a>
 </div>
 
-<!-- results view - shown after user submits -->
+<!-- results view -->
 {% if show_results %}
 
   <div class="results-header">
-    <h3>Here's what you wrote!</h3>
-    <p>The original explanation is on the left. Your version is on the right.</p>
+    <h3>Here's what you remembered!</h3>
+    <p>What you wrote from memory is on the left. The original explanation is on the right.</p>
   </div>
 
   {% for concept in concepts %}
   <div class="comparison-block">
     <h4 class="section-title">{{ concept.term }}</h4>
     <div class="two-col">
+      <div class="col-user">
+        <span class="label label-user">From Memory</span>
+        <p>{{ user_responses[loop.index0] if loop.index0 in user_responses else "(nothing written)" }}</p>
+      </div>
       <div class="col-ai">
         <span class="label label-ai">Explanation</span>
         <p>{{ concept.explanation }}</p>
-      </div>
-      <div class="col-user">
-        <span class="label label-user">Your Words</span>
-        <p>{{ user_responses[loop.index0] if loop.index0 in user_responses else "(nothing written)" }}</p>
       </div>
     </div>
   </div>
@@ -61,15 +61,46 @@
   </div>
 
 
-<!-- write view - explanation on left, user writes on right -->
+<!-- step 2 - write from memory, no explanations shown -->
+{% elif step == 2 %}
+
+  <p class="instruction">
+    Now write each concept <strong>from memory</strong> — no explanations this time.
+    See how much stuck from the first round.
+  </p>
+
+  <form method="POST">
+    <input type="hidden" name="action" value="step2" />
+    {% for concept in concepts %}
+    <div class="brain-dump-card">
+      <label for="response_{{ loop.index0 }}">
+        <h4>{{ concept.term }}</h4>
+      </label>
+      <textarea
+        id="response_{{ loop.index0 }}"
+        name="response_{{ loop.index0 }}"
+        placeholder="Write what you remember about '{{ concept.term }}'..."
+        rows="4"
+      ></textarea>
+    </div>
+    {% endfor %}
+
+    <div class="submit-area">
+      <button type="submit" class="btn-primary">Submit &amp; See Results</button>
+    </div>
+  </form>
+
+
+<!-- step 1 - explanation on left, write paraphrase on right -->
 {% else %}
 
   <p class="instruction">
     Read each explanation, then write it <strong>in your own words</strong> on the right.
-    Putting it in your own words is what makes it stick.
+    After submitting, you'll write it again from memory.
   </p>
 
   <form method="POST">
+    <input type="hidden" name="action" value="step1" />
     {% for concept in concepts %}
     <div class="brain-dump-card">
       <h4>{{ concept.term }}</h4>
@@ -91,7 +122,7 @@
     {% endfor %}
 
     <div class="submit-area">
-      <button type="submit" class="btn-primary">Submit</button>
+      <button type="submit" class="btn-primary">Done — Test Your Memory &rarr;</button>
     </div>
   </form>
 
