@@ -1,5 +1,5 @@
 # MEMORA - AI Study Tool
-# deployed on Render - set GROQ_API_KEY as an environment variable there
+# deployed on Vercel - set GROQ_API_KEY as an environment variable in the Vercel dashboard
 # to run locally: pip install -r requirements.txt, add GROQ_API_KEY to .env, then python3 main.py
 
 import json
