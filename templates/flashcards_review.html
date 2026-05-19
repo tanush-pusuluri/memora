@@ -41,7 +41,13 @@
   <div class="assessment-resources">
     {% for resource in assessment.resources %}
     <div class="resource-card">
-      <strong>{{ resource.name }}</strong>
+      <strong>
+        {% if resource.url %}
+        <a href="{{ resource.url }}" target="_blank" rel="noopener">{{ resource.name }} →</a>
+        {% else %}
+        {{ resource.name }}
+        {% endif %}
+      </strong>
       <p>{{ resource.description }}</p>
     </div>
     {% endfor %}

@@ -5,6 +5,7 @@
 import json
 import os
 import uuid
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -121,16 +122,28 @@ def generate_assessment(topic: str, weak_areas: list) -> dict:
     prompt = f"""A student studying "{topic}" is struggling with these specific concepts: {', '.join(weak_areas)}.
 
 Return ONLY valid JSON — no explanation, no markdown:
-{{"summary": "One sentence about what they need to focus on.", "tips": ["specific study tip 1", "specific study tip 2", "specific study tip 3"], "resources": [{{"name": "Resource name", "description": "What to search for or how to use this resource"}}]}}
+{{"summary": "One sentence about what they need to focus on.", "tips": ["tip 1", "tip 2", "tip 3"], "resources": [{{"name": "Resource name", "type": "youtube or website", "search_query": "what to search for on that platform", "description": "one sentence on how this helps"}}]}}
 
-Pick 3 resources that genuinely fit the subject. Vary them — do not always pick the same ones. Choose from this pool based on what fits best:
+Pick 3 resources that genuinely fit the subject. Vary them — do not always pick the same ones. Choose from this pool:
 
-YouTube: Khan Academy, TED-Ed, Kurzgesagt, Veritasium, CGP Grey, SciShow, Extra History, Tom Scott, 3Blue1Brown, PBS Space Time, Numberphile, Vsauce, AsapSCIENCE, Crash Course (use sparingly)
+YouTube channels (type: "youtube"): Khan Academy, TED-Ed, Kurzgesagt, Veritasium, CGP Grey, SciShow, Extra History, Tom Scott, 3Blue1Brown, PBS Space Time, Numberphile, Vsauce, AsapSCIENCE, Crash Course (use sparingly)
 
-Websites: Khan Academy, Britannica, Wikipedia, National Geographic, Smithsonian Magazine, NASA, HISTORY.com, SparkNotes, MIT OpenCourseWare, Scientific American, Stanford Encyclopedia of Philosophy, National Geographic, BBC (use sparingly), The New York Times Learning Network, Newsela
+Websites (type: "website"): Khan Academy, Britannica, Wikipedia, National Geographic, Smithsonian Magazine, NASA, HISTORY.com, SparkNotes, MIT OpenCourseWare, Scientific American, Stanford Encyclopedia of Philosophy, BBC (use sparingly), The New York Times Learning Network, Newsela
 
-Match the resources to the subject — science topics get science channels, history topics get history sites, math gets math channels. Do not pick the same 3 every time."""
+Match resources to the subject. The search_query should be a short phrase that finds the most relevant content for the weak concepts on that specific resource."""
     return parse_json(ask_ai(prompt))
+
+
+def add_resource_urls(assessment: dict, topic: str) -> dict:
+    if not assessment:
+        return assessment
+    for resource in assessment.get("resources", []):
+        query = quote_plus(f"{resource.get('name', '')} {resource.get('search_query', topic)}")
+        if resource.get("type") == "youtube":
+            resource["url"] = f"https://www.youtube.com/results?search_query={query}"
+        else:
+            resource["url"] = f"https://www.google.com/search?q={query}"
+    return assessment
 
 
 # session helpers
@@ -214,7 +227,7 @@ def flashcards_review():
     indices = request.form.getlist("still_learning")
     weak_cards = [cards[int(i)] for i in indices if i.isdigit() and int(i) < len(cards)]
     weak_areas = [c["question"] for c in weak_cards]
-    assessment = generate_assessment(d["topic"], weak_areas) if weak_areas else None
+    assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
 
     return render_template(
         "flashcards_review.html",
@@ -241,7 +254,8 @@ def quiz():
         score = sum(1 for i, q in enumerate(questions) if user_answers.get(i) == q["answer"])
 
         wrong = [q for i, q in enumerate(questions) if user_answers.get(i) != q["answer"]]
-        assessment = generate_assessment(d["topic"], [q["question"] for q in wrong]) if wrong else None
+        weak_areas = [q["question"] for q in wrong]
+        assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if wrong else None
 
         return render_template(
             "quiz.html",
@@ -298,7 +312,7 @@ def brain_dump():
                 user_responses[i] = text or "(left blank)"
 
             weak_areas = [concepts[i]["term"] for i in range(len(concepts)) if user_responses[i] == "(left blank)"]
-            assessment = generate_assessment(d["topic"], weak_areas) if weak_areas else None
+            assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
 
             return render_template("brain_dump.html",
                 topic=d["topic"], concepts=concepts,
