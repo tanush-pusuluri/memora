@@ -178,33 +178,37 @@ def generate():
     if not topic or mode not in ("flashcards", "quiz", "brain_dump"):
         return redirect(url_for("index"))
 
-    if not is_appropriate_topic(topic):
-        return redirect(url_for("index", error="inappropriate"))
+    try:
+        if not is_appropriate_topic(topic):
+            return redirect(url_for("index", error="inappropriate"))
 
-    if mode == "flashcards":
-        try:
-            count = min(25, max(5, int(request.form.get("card_count", 10))))
-        except (ValueError, TypeError):
-            count = 10
-        difficulty = request.form.get("difficulty", "medium")
-        cards = generate_flashcards(topic, count, difficulty)
-        set_data({"topic": topic, "mode": mode, "cards": cards})
-        return redirect(url_for("flashcards"))
+        if mode == "flashcards":
+            try:
+                count = min(25, max(5, int(request.form.get("card_count", 10))))
+            except (ValueError, TypeError):
+                count = 10
+            difficulty = request.form.get("difficulty", "medium")
+            cards = generate_flashcards(topic, count, difficulty)
+            set_data({"topic": topic, "mode": mode, "cards": cards})
+            return redirect(url_for("flashcards"))
 
-    elif mode == "quiz":
-        try:
-            count = min(20, max(5, int(request.form.get("quiz_count", 8))))
-        except (ValueError, TypeError):
-            count = 8
-        difficulty = request.form.get("difficulty", "medium")
-        questions = generate_quiz(topic, count, difficulty)
-        set_data({"topic": topic, "mode": mode, "questions": questions, "difficulty": difficulty})
-        return redirect(url_for("quiz"))
+        elif mode == "quiz":
+            try:
+                count = min(20, max(5, int(request.form.get("quiz_count", 8))))
+            except (ValueError, TypeError):
+                count = 8
+            difficulty = request.form.get("difficulty", "medium")
+            questions = generate_quiz(topic, count, difficulty)
+            set_data({"topic": topic, "mode": mode, "questions": questions, "difficulty": difficulty})
+            return redirect(url_for("quiz"))
 
-    elif mode == "brain_dump":
-        concepts = generate_brain_dump(topic)
-        set_data({"topic": topic, "mode": mode, "concepts": concepts})
-        return redirect(url_for("brain_dump"))
+        elif mode == "brain_dump":
+            concepts = generate_brain_dump(topic)
+            set_data({"topic": topic, "mode": mode, "concepts": concepts})
+            return redirect(url_for("brain_dump"))
+
+    except Exception:
+        return redirect(url_for("error"))
 
 
 # flashcards routes
@@ -227,7 +231,10 @@ def flashcards_review():
     indices = request.form.getlist("still_learning")
     weak_cards = [cards[int(i)] for i in indices if i.isdigit() and int(i) < len(cards)]
     weak_areas = [c["question"] for c in weak_cards]
-    assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
+    try:
+        assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
+    except Exception:
+        assessment = None
 
     return render_template(
         "flashcards_review.html",
@@ -255,7 +262,10 @@ def quiz():
 
         wrong = [q for i, q in enumerate(questions) if user_answers.get(i) != q["answer"]]
         weak_areas = [q["question"] for q in wrong]
-        assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if wrong else None
+        try:
+            assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if wrong else None
+        except Exception:
+            assessment = None
 
         return render_template(
             "quiz.html",
@@ -276,7 +286,10 @@ def quiz_more():
     if not d or d.get("mode") != "quiz":
         return redirect(url_for("index"))
 
-    new_questions = generate_quiz_more(d["topic"], d.get("difficulty", "medium"), d["questions"])
+    try:
+        new_questions = generate_quiz_more(d["topic"], d.get("difficulty", "medium"), d["questions"])
+    except Exception:
+        return redirect(url_for("error"))
     d["questions"] = new_questions
     set_data(d)
     return redirect(url_for("quiz"))
@@ -312,13 +325,21 @@ def brain_dump():
                 user_responses[i] = text or "(left blank)"
 
             weak_areas = [concepts[i]["term"] for i in range(len(concepts)) if user_responses[i] == "(left blank)"]
-            assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
+            try:
+                assessment = add_resource_urls(generate_assessment(d["topic"], weak_areas), d["topic"]) if weak_areas else None
+            except Exception:
+                assessment = None
 
             return render_template("brain_dump.html",
                 topic=d["topic"], concepts=concepts,
                 user_responses=user_responses, show_results=True, assessment=assessment)
 
     return render_template("brain_dump.html", topic=d["topic"], concepts=concepts, step=1, show_results=False)
+
+
+@app.route("/error")
+def error():
+    return render_template("error.html")
 
 
 if __name__ == "__main__":
