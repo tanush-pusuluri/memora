@@ -14,7 +14,7 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from groq import Groq
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "memora-dev-secret-123")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or os.urandom(24)
 
 # in-memory store - keeps AI responses server-side since cookies have a 4KB limit
 study_data: dict = {}
