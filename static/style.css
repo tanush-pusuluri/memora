@@ -42,6 +42,18 @@ nav {
   font-size: 0.85rem;
   color: #999;
   font-style: italic;
+  flex: 1;
+}
+
+.nav-about {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5b4fcf;
+  text-decoration: none;
+}
+
+.nav-about:hover {
+  text-decoration: underline;
 }
 
 /* ── Main layout ─────────────────────────────────────────── */
